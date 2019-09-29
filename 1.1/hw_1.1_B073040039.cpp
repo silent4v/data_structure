@@ -20,7 +20,7 @@ int main()
         int filled = 1;     //該填入的東西
         data[nowi][nowj] = filled; //前置中
         
-        while(filled <= i*i)    //配置中
+        while(filled < i*i)    //配置中
         {
             nowi--;
             nowj--;
@@ -31,7 +31,16 @@ int main()
             if(data[nowi][nowj] == 0)
                 data[nowi][nowj] = ++filled;    //填入
             else
-                data[++nowi][nowj] = ++filled;  //填入
+            {
+                nowi +=2;
+                ++nowj;
+                if(nowi >= i)
+                nowi -= i;
+                if(nowj >= i)
+                nowj -= i;
+                data[nowi][nowj] = ++filled;  //填入
+            }
+                
         }
         cout << i << ".\n" << endl;
         for(int j = 0 ; j < i ; j++)    //印出
