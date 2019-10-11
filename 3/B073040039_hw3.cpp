@@ -5,64 +5,77 @@ using namespace std;
 
 class pair
 {
-    private:
+    public:
         int x , y;
 };
 
+template <class T>
 class node
 {
     public:
-        int value;
-        node *up , *down;
+        T value;
+        node<T> *up , *down;
         node();
 };
 
+template <class T>
 class stack
 {
     private:
-        node *now , *head;
+        node<T> *now , *head;
         bool started;
     public:
         stack();
-        int top();
+        T top();
         bool empty();
-        void push(int);
-        int pop();
+        void push(T);
+        T pop();
         
 };
 
+map<int,pair>K;
+K[1].x = -2; K[1].y = 1;
+K[2].x = -1; K[2].y = 2;
+K[3].x = 1; K[3].y = 2;
+K[4].x = 2; K[4].y = 1;
+K[5].x = 2; K[5].y = -1;
+K[6].x = 1; K[6].y = -2;
+K[7].x = -1; K[7].y = -2;
+K[8].x = -2; K[8].y = -1;
+
 int main()
 {
-    /*map <int,pair> K;
     int n;
     while(cin >> n)
-    {
-
-    }*/
+        cout << n << endl;
     
     return 0;
 }
 
-node::node()
+template<class T>
+node<T>::node()
 {
     this->up = NULL;
     this->down = NULL;
 }
 
-stack::stack()
+template<class T>
+stack<T>::stack()
 {
     this->now = NULL;
     this->started = false;
 }
 
-bool stack::empty()
+template<class T>
+bool stack<T>::empty()
 {
     if(this->now == NULL)
         return true;
     return false;
 }
 
-int stack::top()
+template<class T>
+T stack<T>::top()
 {
     try
     {
@@ -78,11 +91,12 @@ int stack::top()
     
 }
 
-void stack::push(int x)
+template<class T>
+void stack<T>::push(T x)
 {
     if(!(this->started))
     {
-        this->now = new node;
+        this->now = new node<T>;
         this->now->down = NULL;
         this->head = this->now;
         this->started = true;
@@ -90,7 +104,7 @@ void stack::push(int x)
         
     else
     {
-        this->now->up = new node;
+        this->now->up = new node<T>;
         this->now->up->down = this->now;
         this->now = this->now->up;
     }
@@ -98,7 +112,8 @@ void stack::push(int x)
     
 }
 
-int stack::pop()
+template<class T>
+T stack<T>::pop()
 {
     try
     {
