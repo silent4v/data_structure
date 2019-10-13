@@ -1,9 +1,10 @@
 #include <iostream>
 #include <cstdlib>
 #include <map>
+#include <cstring>
 using namespace std;
 
-class pair
+class Pair
 {
     public:
         int x , y;
@@ -33,21 +34,74 @@ class stack
         
 };
 
-map<int,pair>K;
-K[1].x = -2; K[1].y = 1;
-K[2].x = -1; K[2].y = 2;
-K[3].x = 1; K[3].y = 2;
-K[4].x = 2; K[4].y = 1;
-K[5].x = 2; K[5].y = -1;
-K[6].x = 1; K[6].y = -2;
-K[7].x = -1; K[7].y = -2;
-K[8].x = -2; K[8].y = -1;
+class chess_knight
+{
+    public:
+        Pair pos;
+        int next_step;
+        chess_knight()
+        {
+            pos.x = 0;
+            pos.y = 0;
+            next_step = 1;
+        }
+};
+
+const int K[9][2] =
+{
+    {0,0},{-2,1},{-1,2},{1,2},{2,1},{2,-1},{1,-2},{-1,-2},{-2,-1}
+};
 
 int main()
 {
     int n;
+    bool flag;
+    stack<chess_knight>use;
     while(cin >> n)
-        cout << n << endl;
+    {
+        
+        int visit[n][n];
+        int filled = 0;
+        memset(visit,0,sizeof(int)*n*n);
+        chess_knight cache;
+        while(filled <= n*n)
+        {
+            cout << "step " << filled+1 << endl;; 
+            flag = false;
+            for(int i = cache.next_step ; i <= 8 ; i++)
+            {
+                if( !(visit[cache.pos.x + K[i][0]][cache.pos.y + K[i][1]]) && ( (cache.pos.x + K[i][0]) >= 0) && ( (cache.pos.x + K[i][0]) < n) && ( (cache.pos.y + K[i][1]) >= 0) && ( (cache.pos.y + K[i][1]) < n) )
+                {
+                    visit[cache.pos.x][cache.pos.y] = ++filled;
+                    cache.next_step = i;
+                    use.push(cache);
+                    cache.pos.x += K[i][0];
+                    cache.pos.y += K[i][1];
+                    cout << "x = " << cache.pos.x << "\ny = " << cache.pos.y << endl;
+                    cout << filled << ". top = " << use.top().pos.x << " " << use.top().pos.y << " " << use.top().next_step << endl;
+                    flag = true;
+                    break;
+                }
+            }
+            if(!flag)
+            {
+                visit[cache.pos.x][cache.pos.y] = 0;
+                cout << "now pop" << endl;
+                cache = use.pop();
+                
+                --filled;
+            }
+                
+        }
+        for(int i = 0 ; i < n ; i++)
+        {
+            for(int j = 0 ; j < n ; j++)
+                cout << visit[i][j] << " ";
+            cout << endl;
+        }
+        while(!use.empty())
+            use.pop();
+    }
     
     return 0;
 }
@@ -86,7 +140,7 @@ T stack<T>::top()
     catch(int err)
     {
         cout << "stack is empty" << endl;
-        return err;
+        return this->now->value;
     }
     
 }
@@ -117,8 +171,8 @@ T stack<T>::pop()
 {
     try
     {
-        int cache = this->now->value;
-        cout << "now = " << cache << endl;
+        T cache = this->now->value;
+        //cout << "now = " << cache << endl;
         if(this->now->down == NULL)
         {
             delete now;
@@ -126,8 +180,8 @@ T stack<T>::pop()
             return cache;
         }
         this->now = this->now->down;
-        cout << "now = " << this->now->value << endl;
-        system("pause");
+        //cout << "now = " << this->now->value << endl;
+        //system("pause");
         delete this->now->up;
         this->now->up = NULL;
         return cache;
@@ -135,7 +189,7 @@ T stack<T>::pop()
     catch(int err)
     {
         cout << "stack is empty" << endl;
-        return -1;
+        return this->now->value;
     }
     
     
