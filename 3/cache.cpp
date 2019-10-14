@@ -2,21 +2,17 @@
 #include <list>
 #include <cstring>
 using namespace std;
-/*
-    author:B073040039
-    date:2019/10/14
-    description:stack
-*/
-class Pair      //pair
+
+class Pair
 {
     public:
         int x,y;
-        Pair()      //initialize
+        Pair()
         {
             x = 0;
             y = 0;
         }
-        Pair & operator =(Pair u)   //define operator =
+        Pair & operator =(Pair u)
         {
             x = u.x;
             y = u.y;
@@ -24,7 +20,7 @@ class Pair      //pair
 };
 
 template<class T>
-class node      //node
+class node
 {
     public:
         T value;
@@ -35,8 +31,8 @@ class node      //node
         }
 };
 
-template <class T>  
-class stack     //stack
+template <class T>
+class stack
 {
     public:
         int level;
@@ -91,7 +87,7 @@ class stack     //stack
         }
         
 };
-//define K
+
 const int K[9][2] =
 {
     {0,0},{-2,1},{-1,2},{1,2},{2,1},{2,-1},{1,-2},{-1,-2},{-2,-1}
@@ -99,17 +95,17 @@ const int K[9][2] =
 
 int main()
 {
+    stack<Pair>pos;
+    stack<int>step;
+    Pair now_pos;
     int next_step , n , filled;
     bool solution , p , flag;
-    for(n = 3 ; n <= 6 ; n++)
+    while(cin >> n)
     {
-        cout << "n = " << n << endl;
-        Pair now_pos;   //cache of stack Pair
-        stack<Pair>pos; //stack Pair
-        stack<int>step; //stack int
+        p = true;
         solution = true;
         flag = true;
-        int visit[n][n];    //visit array
+        int visit[n][n];
         memset(visit,0,sizeof(int)*n*n);
         next_step = 0;
         filled = 0;
@@ -121,7 +117,7 @@ int main()
                 pos.push(now_pos);
                 next_step = 0;
             }
-            if(filled >= n*n)   //check again
+            if(filled >= n*n)
                 break;
             flag = false;
             for(int i = next_step+1 ; i <= 8 ; i++)
@@ -131,12 +127,12 @@ int main()
                     next_step = i;
                     step.push(next_step);
                     now_pos.x += K[i][0]; now_pos.y += K[i][1];
-                    flag = true;    //if next_step exist
+                    flag = true;
                     break;
                 }
             }
 
-            if(!flag) //next_step isn't exist
+            if(!flag)
             {
                 visit[now_pos.x][now_pos.y] = 0;
                 --filled;
@@ -148,10 +144,13 @@ int main()
                 }
                 next_step = step.pop();
                 now_pos = pos.top();
+                p = false;
             }
+            cout << endl;
+            
         }
 
-        if(solution) //if solution exist
+        if(solution)
         {
             for(int i = 0 ; i < n ; i++)
             {
@@ -162,9 +161,5 @@ int main()
         }
         else
             cout << "no solution" << endl;
-        while(!pos.empty())     //release memory
-            pos.pop();
-        while(!step.empty())    //release memory
-            step.pop();
     }
 }
