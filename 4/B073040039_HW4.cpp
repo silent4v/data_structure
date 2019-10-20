@@ -1,33 +1,40 @@
 #include <iostream>
-#include <cstring>
 #include <vector>
-#include <cstdlib>
 using namespace std;
-const int n = 3;
-class Pair      //pair
+/*
+    author:B073040039
+    date:2019/10/14
+    description:stack
+*/
+class point     //point
 {
     public:
         int x,y;
-        Pair() { x = 0; y = 0;}
-        Pair & operator =(Pair u) { x = u.x; y = u.y;}
+        point() {x=0;y=0;}
+        point& operator =(point u) {x=u.x;y=u.y;}
 };
-
-const int K[9][2] ={ {0,0},{-2,1},{-1,2},{1,2},{2,1},{2,-1},{1,-2},{-1,-2},{-2,-1} };
-
-void f(int x[][n],int step,Pair pos,bool* flag,bool* solution)
+const int K[9][2] = {{0,0},{-2,1},{-1,2},{1,2},{2,1},{2,-1},{1,-2},{-1,-2},{-2,-1}};    //initialize
+void f(vector<vector<int>> &x , int step , point pos , int s , bool *flag)   //s is size
 {
-    int prev,next = step;
-    *flag = true;
-    if(*solution)
-        return;
-    Pair cache = pos;
-    x[pos.x][pos.y] = next;
-    if(next == n*n)
+    if(step > s*s)
     {
-        *solution = true;
-        for(int i = 0 ; i < n ; i++)
+        *flag = true;   //have answer
+        for(int i = 0 ; i < s ; i++)
         {
-            for(int j = 0 ; j < n ; j++)
+            for(int j = 0 ; j < s ; j++)
+                cout << x[i][j] << " ";
+            cout << endl;
+        }
+        return;
+    }
+    point next_pos;     //for recursive
+    x[pos.x][pos.y] = step;
+    if(step == s*s)
+    {
+        *flag = true;
+        for(int i = 0 ; i < s ; i++)
+        {
+            for(int j = 0 ; j < s ; j++)
                 cout << x[i][j] << " ";
             cout << endl;
         }
@@ -35,36 +42,43 @@ void f(int x[][n],int step,Pair pos,bool* flag,bool* solution)
     }
     for(int i = 1 ; i <= 8 ; i++)
     {
-        if(!(x[pos.x + K[i][0]][pos.y + K[i][1]]) && ( (pos.x + K[i][0]) >= 0) && ( (pos.x + K[i][0]) < n) && ( (pos.y + K[i][1]) >= 0) && ( (pos.y + K[i][1]) < n) )
+        if(*flag)   //if have answer , return
+            return;
+        if(((pos.x + K[i][0]) >= 0) && ( (pos.x + K[i][0]) < s) && ( (pos.y + K[i][1]) >= 0) && ( (pos.y + K[i][1]) < s))
         {
-            fflush(stdout);
-            fflush(stdin);
-            if(!(*flag))
-                cache.x -= K[prev][0]; cache.y -= K[prev][1];
-            cache.x += K[i][0]; cache.y += K[i][1];
-            prev = i;
-            f(x,next+1,cache,flag,solution);
+            if(!(x[pos.x + K[i][0]][pos.y + K[i][1]]))
+            {
+                next_pos = pos;
+                next_pos.x += K[i][0]; next_pos.y += K[i][1];
+                f(x,step+1,next_pos,s,flag);
+            }
         }
-    }   
+    }
     x[pos.x][pos.y] = 0;
-    *flag = false;
-    if(next <= 1 && !(*solution))
+    if(step == 1)   //no answer
         cout << "no solution" << endl;
     return;
 }
-
 int main()
 {
-    int visit[n][n];
-    for(int i = 0 ; i < n ; i++)
-        for(int j = 0 ; j < n ; j++)
-            visit[i][j] = 0;
-    Pair cache;
+    int n;
+    point p;
+    vector<vector<int>>visit;
+    vector<int>v;
     bool *check = new bool;
-    bool *answer = new bool;
-    *check = true;
-    *answer = false;
-    f(visit,1,cache,check,answer);
-    delete check;
-    delete answer;
+    for(n = 3 ; n <= 6 ; n++)
+    {
+        visit.clear();
+        *check = false;    
+        for(int i = 0 ; i < n ; i++)    //initialize visit 
+        {
+            v.clear();
+            for(int j = 0 ; j < n ; j++)
+                v.push_back(0);
+            visit.push_back(v);
+        }
+        f(visit , 1 , p , n , check);
+        cout << endl;
+    }
+    return 0;
 }
