@@ -1,43 +1,31 @@
 #include <iostream>
-#include <map>
 using namespace std;
+/*
+    author:B073040039
+    date:2019/11/04
+    description:poly
+*/
 class node
 {
     public:
         int co , ex;    //co is coefficient , ex is exponent
         node *next;
-        node() 
-        {
-            co = 0;
-            ex = 0;
-            next = NULL;
-        }
-        node(int c,int e)
-        {
-            co = c;
-            ex = e;
-            next = NULL;
-        }
+        //constructor
+        node()  {co = 0; ex = 0; next = nullptr;}
+        node(int c,int e){co = c; ex = e; next = nullptr;}
 };
+
 class poly
 {
     public:
         node *head , *end;
-        poly(){ head = end = NULL; }
-        bool empty()
-        {
-            if(head == end)
-                return true;
-            return false;
-        }
-        void add(node *x)
+        poly(){ head = end = nullptr; }
+        bool empty(){ return ((head == end) ? true : false); }
+        void add(node *x)   //add node
         {
             node *prev,*cache;
-            if(this->empty())
-            {
-                   head = x->next; 
-                   end = x;
-            }
+            if(this->empty()) {head = x->next; end = x;}
+            else if(x->co == 0) return;
             else
             {
                 if(x->ex > end->ex)
@@ -53,7 +41,7 @@ class poly
                         prev = cache;
                         cache = cache->next;
                     }
-                    if(x->ex == cache->ex)
+                    if((cache != head) && (x->ex == cache->ex))
                     {
                         cache->co += x->co;
                     }
@@ -65,45 +53,49 @@ class poly
                 }
             }
         }
-        void clear()
+        void clear()    //clear node
         {
             node *cache;
-            do
+            while(end != head)
             {
                 cache = end;
-                cout << "(" << cache->co << " , " << cache->ex << ")" << endl;
                 end = end->next;
                 delete cache;
-            } while(end != head);
+            } 
         }
-        friend poly* operator +(poly&,poly&);
-        poly& operator =(poly x)
+        friend ostream& operator <<(ostream &,poly);    //operator << overloading
+        friend poly* operator +(poly&,poly&);    //operator + overloading
+        poly& operator =(poly &x)    //operator = overloading
         {
-            node *for_new,*cache = x.end;
+            node *cache,*space;
+            if(!(this->empty()))
+                this->clear();
+            cache = x.end;
             while(cache != x.head)
             {
-                for_new = new node(cache->co,cache->ex);
-                this->add(for_new);
+                space = new node(cache->co,cache->ex);
+                this->add(space);
                 cache = cache->next;
             }
             return *this;
         }
-        poly& operator =(poly *x)
+        poly& operator =(poly *x)    //another operator << overloading
         {
             this->end = x->end;
             this->head = x->head;
             return *this;
         }
+        friend poly* operator *(poly&,poly&);
 };
 
 int main()
 {
-    poly a,b,plus;
+    poly a,b,*plus,*mul;
     int p,q,c,e;    //p is a's size , q is b's size,coeffient,exponent
     node *input;
     while(cin >> p)
     {
-        for(int i = 0 ; i < p ; i++)
+        for(int i = 0 ; i < p ; i++)    //add p
         {
             cin >> c >> e;
             input = new node(c,e);
@@ -112,60 +104,95 @@ int main()
         cin >> q;
         if(!p && !q)
             break;
-        for(int i = 0 ; i < q ; i++)
+        for(int i = 0 ; i < q ; i++)    //add q
         {
             cin >> c >> e;
             input = new node(c,e);
             b.add(input);
         }
         plus = (a+b);
-        cout << "A:" << endl;
+        mul = (a*b);
+        //output
+        cout << "A:\n" << a ;
+        cout << "B:\n" << b ;
+        cout << "plus\n" << *plus;
+        cout << "multiple\n" << *mul;
         a.clear();
-        cout << "B" << endl;
         b.clear();
-        cout << "plus:" << endl;
-        plus.clear();
-        cout << "delete complete" << endl;
+        plus->clear();
+        mul->clear();
+        //clean heap
+        delete plus;
+        delete mul;
     }
     return 0;
+}
+
+ostream& operator <<(ostream &s,poly x)
+{
+    int sum = 0;
+    if(x.empty())      //if list is empty , print 0,0
+        s << "(0 , 0)" << endl;
+    else
+    {
+        node *cache;
+        cache = x.end;
+        while(cache != x.head)
+        {
+            if(cache->co != 0)
+            {
+                s << "(" << cache->co << " , " << cache->ex << ")" << endl;
+                sum++;
+            }
+           
+            cache = cache->next;
+        }
+         if(sum == 0)
+                s << "(0 , 0)" << endl;
+    }
+    return s;
 }
 
 poly* operator +(poly &x,poly &y)
 {
     poly *for_return = new poly;
-    node *nowx,*nowy,*cache;
+    node *space,*cache;
+    cache = x.end;
+    while(cache != x.head)  //add node 
+    {
+        space = new node(cache->co,cache->ex);
+        for_return->add(space);
+        cache = cache ->next;
+    }
+    cache = y.end;
+    while(cache != y.head)  //add node again
+    {
+        space = new node(cache->co,cache->ex);
+        for_return->add(space);
+        cache = cache ->next;
+    }
+    return for_return;
+}
+poly* operator *(poly &x,poly &y)
+{
+    poly *for_return = new poly;
+    node *space,*nowx,*nowy;
     int c,e;
-    nowx = x.end; nowy = y.end;
+    nowx = x.end;
     while(nowx != x.head)
     {
         nowy = y.end;
-        c = nowx->co;
         while(nowy != y.head)
         {
-            if(nowx->ex == nowy->ex)
-                c += nowy->co;
+            c = nowy->co;
+            c *= nowx->co;
+            e = nowy->ex;
+            e += nowx->ex;
+            space = new node(c,e); 
+            for_return->add(space);     //add node again and again
             nowy = nowy->next;
         }
-        e = nowx->ex;
-        cache = new node(c,e);
-        for_return->add(cache);
         nowx = nowx->next;
-    }   
-    nowy = y.end;
-    while(nowy != y.head)
-    {
-        nowx = x.end;
-        c = nowy->co;
-        while(nowx != x.head)
-        {
-            if(nowy->ex == nowx->ex)
-                c += nowy->co;
-            nowx = nowx->next;
-        }
-        e = nowx->ex;
-        cache = new node(c,e);
-        for_return->add(cache);
-        nowy = nowy->next;
     }
     return for_return;
 }
